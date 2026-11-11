@@ -90,22 +90,84 @@ section.pad{padding:90px 0}
 .tags span{background:#fff;border:1px solid var(--line);padding:8px 18px;border-radius:999px;font-size:14px;font-weight:600;color:var(--rose-d)}
 
 /* form */
-.formbox{max-width:640px;margin:0 auto;background:#fff;border:1px solid var(--line);border-radius:32px;padding:clamp(24px,5vw,46px);box-shadow:0 30px 60px -30px rgba(224,80,122,.4)}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-@media(max-width:600px){.row{grid-template-columns:1fr}}
-label{display:block;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--mute);margin:16px 0 6px}
-input,select,textarea{width:100%;padding:13px 16px;border-radius:14px;border:1.5px solid var(--line);background:#fffafb;font:15px 'Plus Jakarta Sans',sans-serif;color:var(--ink);transition:border .2s,box-shadow .2s}
-input:focus,select:focus,textarea:focus{outline:0;border-color:var(--rose);box-shadow:0 0 0 4px rgba(224,80,122,.12)}
-textarea{resize:vertical;min-height:100px}
-.formbox .btn{width:100%;margin-top:22px;padding:15px}
-.msg{display:none;margin-top:16px;padding:14px;border-radius:14px;text-align:center;font-size:14px}
-.msg.ok{display:block;background:#eaf8ef;color:#216a3a}
-.msg.err{display:block;background:#fdecec;color:#9b2c2c}
-.hp{position:absolute;left:-9999px}
+<!-- HTML Form Code -->
+<div class="formbox">
+  <form id="contactForm">
+    <input type="text" name="hp" class="hp" tabindex="-1" autocomplete="off">
 
-footer{background:#fff;border-top:1px solid var(--line);padding:36px 0;text-align:center;color:var(--mute);font-size:14px}
-footer .logo{display:block;margin-bottom:6px}
-footer a{color:var(--rose-d);font-weight:600}
+    <div class="row">
+      <div>
+        <label for="name">Your Name *</label>
+        <input type="text" id="name" name="name" required placeholder="Your Name">
+      </div>
+      <div>
+        <label for="phone">Phone / WhatsApp *</label>
+        <input type="tel" id="phone" name="phone" required placeholder="Phone Number">
+      </div>
+    </div>
+
+    <div>
+      <label for="whatWouldYouLike">What would you like?</label>
+      <input type="text" id="whatWouldYouLike" name="whatWouldYouLike" placeholder="What would you like?">
+    </div>
+
+    <div>
+      <label for="deliveryAddress">City / Delivery Address</label>
+      <input type="text" id="deliveryAddress" name="deliveryAddress" placeholder="City/Delivery Address">
+    </div>
+
+    <div>
+      <label for="details">Colours, Theme, Budget, Date</label>
+      <textarea id="details" name="details" placeholder="Colours, theme, budget, date"></textarea>
+    </div>
+
+    <button type="submit" class="btn" id="submitBtn">Send Message</button>
+    
+    <div id="msgSuccess" class="msg ok">Thank you! Your message has been sent.</div>
+    <div id="msgError" class="msg err">Please enter Name and Phone Number.</div>
+  </form>
+</div>
+
+<script>
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbwsq0b1eWImsm23KjXCYqpg6dxIsrRfw-iBZWjLNfBzOPiHX9MOCyD3YcijUmFV9iuU/exec';
+  const form = document.getElementById('contactForm');
+  const submitBtn = document.getElementById('submitBtn');
+  const msgSuccess = document.getElementById('msgSuccess');
+  const msgError = document.getElementById('msgError');
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+
+    if (form.hp.value) return;
+
+    const name = document.getElementById('name').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+
+    if (!name || !phone) {
+      msgError.style.display = 'block';
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending...';
+    msgSuccess.style.display = 'none';
+    msgError.style.display = 'none';
+
+    fetch(scriptURL, { method: 'POST', body: new FormData(form) })
+      .then(response => {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Send Message';
+        msgSuccess.style.display = 'block';
+        form.reset();
+      })
+      .catch(error => {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Send Message';
+        msgError.style.display = 'block';
+        console.error('Error!', error.message);
+      });
+  });
+</script>
 
 /* reveal */
 .rv{opacity:0;transform:translateY(34px);transition:opacity .9s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1)}
